@@ -1,49 +1,139 @@
-const goods = [
-  { title: "Shirt", price: 150 },
-  { title: "Socks", price: 50 },
-  { title: "Jacket", price: 350 },
-  { title: "Shoes", price: 250 },
-  { title: "Shirt", price: 150 },
-  { title: "Socks", price: 50 },
-  { title: "Jacket", price: 350 },
-  { title: "Shoes", price: 250 },
-  { title: "Shirt", price: 150 },
-  { title: "Socks", price: 50 },
-  { title: "Jacket", price: 350 },
-  { title: "Shoes", price: 250 },
-  { title: "Shirt", price: 150 },
-  { title: "Socks", price: 50 },
-  { title: "Jacket", price: 350 },
-];
+/** Класс, представляющий товар. */
+class GoodsItem {
+  /**
+   * Создает объект товара.
+   * @param {string} title название товара (значение по умолчанию "Nameless").
+   * @param {number} price стоимость товара (значение по умолчанию 0).
+   */
+  constructor(title = "Nameless", price = 0) {
+    this.title = title;
+    this.price = price;
+  }
 
-/**
- * Функция возвращает разметку для карточки товара.
- * @param {{}} param объект товара.
- * @returns разметка карточки товара.
- */
-const getGoodsItemMarkup = ({ title = "Nameless", price = 0 }) => `
-    <div class="goods-item">
-       <h3 class="goods-item__title">${title}</h3>
-       <p class="goods-item__price">${price}</p>
-    </div>
+  /**
+   * Возвращает HTML разметку карточки товара в виде строки.
+   * @returns HTML разметка.
+   */
+  render() {
+    return `
+  <div class="goods-item">
+  <h3 class="goods-item__title">${this.title}</h3>
+  <p class="goods-item__price">${this.price}</p>
+  </div>
   `;
+  }
+}
 
-/**
- * Функция создает разметку для массива товаров и добавляет ее на страницу в
- * блок с классом "goods-list".
- * @param {[]} _goods массив товаров.
- */
-const renderGoodsList = (_goods) => {
-  let goodsList = _goods.map((_item) => getGoodsItemMarkup(_item));
+/** Класс, представляющий список товаров. */
+class GoodsList {
+  _goods = [];
 
-  /* Ответ на вопрос про запятую в разметке из урока.
+  /**
+   * Создает объект списка товаров.
+   */
+  constructor() {
+    this.fetchGoods();
+  }
 
-     Строка кода из урока:
-     document.querySelector(".goods-list").innerHTML = goodsList;.
+  /**
+   * Получает данные о товарах с сервера.
+   */
+  fetchGoods() {
+    this._goods = [
+      { title: "Shirt", price: 150 },
+      { title: "Socks", price: 50 },
+      { title: "Jacket", price: 350 },
+      { title: "Shoes", price: 250 },
+      { title: "Shirt", price: 150 },
+      { title: "Socks", price: 50 },
+      { title: "Jacket", price: 350 },
+      { title: "Shoes", price: 250 },
+      { title: "Shirt", price: 150 },
+      { title: "Socks", price: 50 },
+      { title: "Jacket", price: 350 },
+      { title: "Shoes", price: 250 },
+      { title: "Shirt", price: 150 },
+      { title: "Socks", price: 50 },
+      { title: "Jacket", price: 350 },
+    ];
+  }
 
-     Так как goodsList представляет из себя массив, а типом данных поля innerHTML является строка, в строке кода из урока происходит динамическое преобразование массива в строку в результате чего разделитель между элементами массива попал в разметку. */
+  /**
+   * Добавляет HTML разметку карточек товара на страницу в блок с
+   * классом "goods-list".
+   */
+  render() {
+    const goodItemsHTML = this._goods.map(({ title, price }) => {
+      const goodItem = new GoodsItem(title, price);
+      return goodItem.render();
+    });
+    document.querySelector(".goods-list").innerHTML = goodItemsHTML.join(" ");
+  }
 
-  document.querySelector(".goods-list").innerHTML = goodsList.join(" ");
+  /**
+   * Возвращает общую стоимость товаров в списке.
+   * @returns {number} общая стоимость товаров.
+   */
+  getTotalItemsPrice() {
+    let totalPrice = 0;
+    this._goods.forEach((item) => (totalPrice += item.price));
+    return totalPrice;
+  }
+}
+
+/** Класс, представляющий корзину с товарами. */
+class Cart {
+  /**
+   * Возвращает HTML разметку корзины.
+   */
+  render() {}
+
+  /**
+   * Добавляет товар в корзину.
+   */
+  addItem() {}
+
+  /**
+   * Удаляет товар из корзины.
+   */
+  delItem() {}
+
+  /**
+   * Сортирует товары в корзине.
+   */
+  sort() {}
+
+  /**
+   * Возвращает общее количество товаров в корзине.
+   */
+  getTotalNumberOfItems() {}
+
+  /**
+   * Возвращает общую стоимость товаров в корзине.
+   */
+  getTotalItemsPrice() {}
+}
+
+/** Класс, представляющий определенный товар в корзине. */
+class CartItem {
+  /**
+   * Увеличивает количество товара на единицу.
+   */
+  add() {}
+
+  /**
+   * Уменьшает количество товара на единицу.
+   */
+  sub() {}
+
+  /**
+   * Возвращает общую стоимость товара.
+   */
+  getTotalItemPrice() {}
+}
+
+onload = () => {
+  const goodsList = new GoodsList();
+  goodsList.render();
+  console.log(goodsList.getTotalItemsPrice());
 };
-
-onload = () => renderGoodsList(goods);
