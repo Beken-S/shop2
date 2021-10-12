@@ -38,7 +38,6 @@
 }
 .header-bottom__content {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   min-height: 75px;
 }
@@ -131,6 +130,27 @@
 
 .show {
   display: block;
+}
+
+.search-form {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 50px;
+}
+.search-form__input-field {
+  width: 500px;
+  padding: 8px 20px;
+  font: normal 1.2rem/1.2 Roboto, sans-serif;
+  color: black;
+  border: 2px solid #929292;
+  border-right: none;
+  border-radius: 20px 0 0 20px;
+  outline: none;
+}
+.search-form__button {
+  border-radius: 0 20px 20px 0;
 }
 
 /*# sourceMappingURL=styles.css.map */
