@@ -60,12 +60,19 @@ class GoodsItem {
 /** Класс, представляющий список товаров. */
 class GoodsList extends API {
   _goods = [];
+  _filteredGoods = [];
+  goodsList = document.querySelector(".goods-list");
+  searchButton = document.querySelector(".search-form__button");
+  searchInput = document.querySelector(".search-form__input-field");
 
   /**
    * Создает объект списка товаров.
    */
   constructor(cart) {
     super();
+    this.searchButton.addEventListener("click", () => {
+      this.filteredGoods(this.searchInput.value);
+    });
     this.fetchGoods().then(() => {
       this.render(cart);
     });
@@ -79,7 +86,10 @@ class GoodsList extends API {
       `${this.API_URL}/catalogData.json`,
       "GET",
       "json"
-    ).then((goods) => (this._goods = goods));
+    ).then((goods) => {
+      this._goods = goods;
+      this._filteredGoods = goods;
+    });
   }
 
   /**
@@ -94,11 +104,12 @@ class GoodsList extends API {
    */
   render(cart) {
     const fragment = document.createDocumentFragment();
-    this._goods.forEach(({ id_product, product_name, price }) => {
+    this._filteredGoods.forEach(({ id_product, product_name, price }) => {
       const goodItem = new GoodsItem(id_product, product_name, price);
       fragment.appendChild(goodItem.getElement(cart));
     });
-    document.querySelector(".goods-list").appendChild(fragment);
+    this.goodsList.textContent = "";
+    this.goodsList.appendChild(fragment);
   }
 
   /**
@@ -109,6 +120,17 @@ class GoodsList extends API {
     return this._goods.reduce((totalPrice, { price }) => {
       return (totalPrice += price);
     }, 0);
+  }
+  /**
+   * Фильтрует список товаров по имени товара.
+   * @param {string} value строка поиска.
+   */
+  filteredGoods(value) {
+    const regexp = new RegExp(value, "i");
+    this._filteredGoods = this._goods.filter((good) => {
+      return regexp.test(good.product_name);
+    });
+    this.render();
   }
 }
 
@@ -139,7 +161,7 @@ class Cart extends API {
   }
 
   /**
-   * Формирует запрос на сервис для получения корзины товаров.
+   * Формирует запрос на сервер для получения корзины товаров.
    * @returns ответ.
    */
   fetchCart() {
