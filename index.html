@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;900&display=swap"
       rel="stylesheet"
@@ -13,10 +12,10 @@
     <link rel="stylesheet" href="styles/normalize.css" />
     <link rel="stylesheet" href="styles/styles.css" />
     <title>eShop</title>
-    <script src="scripts/main.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   </head>
   <body>
-    <div class="wrapper">
+    <div id="app" class="wrapper">
       <header class="wrapper__header">
         <div class="header-top">
           <div class="container">
@@ -27,33 +26,47 @@
           <div class="container">
             <div class="header-bottom__content">
               <div class="search-form">
-                <input class="search-form__input-field" type="text" />
+                <input
+                  class="search-form__input-field"
+                  type="text"
+                  v-model="search"
+                />
                 <button
                   class="button button_style_main search-form__button"
                   type="button"
+                  @click="filterGoods"
                 >
                   Найти
                 </button>
               </div>
-              <button
-                id="cart"
-                class="cart-button button button_style_main"
-                type="button"
-              >
-                Корзина
-              </button>
+              <div class="cart">
+                <button
+                  class="cart-button button button_style_main"
+                  type="button"
+                  @click="setVision"
+                >
+                  Корзина
+                </button>
+                <cart-pup-up-menu v-if="cartPopupVision"></cart-pup-up-menu>
+              </div>
             </div>
           </div>
         </div>
       </header>
       <main class="wrapper__content">
         <div class="container">
-          <div class="goods-list"></div>
+          <div class="goods-list">
+            <goods-item
+              v-for="item in filteredGoods"
+              v-bind:item="item"
+            ></goods-item>
+          </div>
         </div>
       </main>
       <footer class="wrapper__footer footer">
         <div class="container"></div>
       </footer>
     </div>
+    <script src="scripts/main.js"></script>
   </body>
 </html>
