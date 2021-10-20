@@ -1,57 +1,208 @@
 "use strict";
 
-Vue.component("goods-item", {
-  props: ["item"],
+const API_URL =
+  "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
+
+// Компонент кнопки.
+const customButton = {
+  data: function () {
+    return {
+      classList: ["button"],
+    };
+  },
   template: `
-      <div class="goods-item">
-        <h3 class="goods-item__title">{{ item.title }}</h3>
-        <button class="button button_style_second button_add">Добавить</button>
-        <p class="goods-item__price">{{ item.price }}</p>
-      </div>
+      <button :class="classList" type="button" @click="$emit('click')">
+        <slot></slot>
+      </button>
     `,
-});
+};
 
-Vue.component("cart-pup-up-menu", {
+// Компонент всплывающего меню.
+const popUpMenu = {
+  data: function () {
+    return {
+      classList: ["pup-up-menu"],
+      buttonClassList: ["button_style_close", "pup-up-menu__close-button"],
+    };
+  },
+  components: {
+    customButton,
+  },
   template: `
-    <div class="cart__pup-up-menu">
+    <div :class="classList">
+      <custom-button :class="buttonClassList" @click="$emit('close')">
+        &#128939;
+      </custom-button>
+      <slot></slot>
     </div>
   `,
-});
+};
 
-Vue.component("cart-goods-item", {
-  props: ["item"],
+const cart = {
+  data: function () {
+    return {
+      cartPopupVision: false,
+      classList: ["cart"],
+      buttonClassList: ["button_style_main"],
+      menuClassList: ["cart__pop-up-menu"],
+    };
+  },
+  components: {
+    customButton,
+    popUpMenu,
+  },
   template: `
-    <div class="cart__goods-item">
-      <div>{{ item.title }}</div>
-      <div>{{ item.price }}</div>
-      <button class="button button_style_second">Удалить</button>
+    <div :class="classList">
+      <custom-button :class="buttonClassList" @click="open">
+        Корзина
+      </custom-button>
+      <pop-up-menu :class="menuClassList" v-if="cartPopupVision" @close="close">
+        <slot></slot>
+      </pop-up-menu>
+    </div>
+
+  `,
+  methods: {
+    open: function () {
+      this.cartPopupVision = true;
+    },
+    close: function () {
+      this.cartPopupVision = false;
+    },
+  },
+};
+
+// Компонент списка товаров в корзине.
+const cartGoodsItem = {
+  props: {
+    title: String,
+    price: Number,
+  },
+  data: function () {
+    return {
+      classList: ["cart__goods-item"],
+      buttonClassList: ["button_style_second"],
+    };
+  },
+  components: {
+    customButton,
+  },
+  template: `
+    <div :class="classList">
+      <div>{{ title }}</div>
+      <div>{{ price }}</div>
+      <custom-button :class="buttonClassList" @click="$emit('delete-item')">
+        Удалить
+      </custom-button>
     </div>
   `,
-});
+};
 
-const GOODS = [
-  { title: "Shirt", price: 150 },
-  { title: "Socks", price: 50 },
-  { title: "Jacket", price: 350 },
-  { title: "Shoes", price: 250 },
-];
+// Компонент карточки товара.
+const goodsItem = {
+  props: {
+    title: String,
+    price: Number,
+  },
+  data: function () {
+    return {
+      classList: ["goods-item"],
+      titleClassList: ["goods-item__title"],
+      priceClassList: ["goods-item__price"],
+      buttonClassList: ["button_style_second", "button_add"],
+    };
+  },
+  components: {
+    customButton,
+  },
+  template: `
+    <div :class="classList">
+      <h3 :class="titleClassList">{{ title }}</h3>
+      <custom-button :class="buttonClassList" @click="$emit('add-to-cart')">
+        Добавить
+      </custom-button>
+      <p :class="priceClassList">{{ price }}</p>
+    </div>
+  `,
+};
+
+// Компонент списка товаров.
+const goodsList = {
+  data: function () {
+    return {
+      classList: ["goods-list"],
+    };
+  },
+  template: `
+    <div :class="classList">
+      <slot></slot>
+    </div>
+  `,
+};
+
+// Компонент формы поиска товаров.
+const searchForm = {
+  data: function () {
+    return {
+      classList: ["search-form"],
+      inputClassList: ["search-form__input-field"],
+      buttonClassList: ["button_style_main", "search-form__button"],
+    };
+  },
+  components: {
+    customButton,
+  },
+  template: `
+    <div :class="classList">
+      <input
+        :class="inputClassList"
+        type="text"
+        v-on:input="$emit('input', $event.target.value)"
+      />
+      <custom-button :class="buttonClassList" @click="$emit('search')">
+        Найти
+      </custom-button>
+    </div>
+  `,
+};
 
 const app = new Vue({
   el: "#app",
   data: {
-    goods: GOODS,
-    filteredGoods: GOODS,
-    cartPopupVision: false,
+    goods: [],
+    filteredGoods: [],
+    cart: [],
     search: "",
+  },
+  components: {
+    cart,
+    cartGoodsItem,
+    goodsItem,
+    goodsList,
+    searchForm,
   },
   methods: {
     filterGoods: function () {
       this.filteredGoods = this.goods.filter((item) => {
-        return new RegExp(this.search, "i").test(item.title);
+        return new RegExp(this.search, "i").test(item.product_name);
       });
     },
-    setVision: function () {
-      this.cartPopupVision = !this.cartPopupVision;
+    getCart: function () {
+      return fetch(`${API_URL}/getBasket.json`).then((response) =>
+        response.json()
+      );
     },
+    getGoods: function () {
+      return fetch(`${API_URL}/catalogData.json`).then((response) =>
+        response.json()
+      );
+    },
+  },
+  mounted: function () {
+    this.getGoods().then((res) => {
+      this.goods = res;
+      this.filteredGoods = res;
+    });
+    this.getCart().then((res) => (this.cart = res.contents));
   },
 });
