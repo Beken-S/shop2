@@ -25,42 +25,32 @@
         <div class="header-bottom">
           <div class="container">
             <div class="header-bottom__content">
-              <div class="search-form">
-                <input
-                  class="search-form__input-field"
-                  type="text"
-                  v-model="search"
-                />
-                <button
-                  class="button button_style_main search-form__button"
-                  type="button"
-                  @click="filterGoods"
+              <search-form v-model="search" @search="filterGoods"></search-form>
+              <cart>
+                <cart-goods-item
+                  v-for="item in cart"
+                  :key="item.id_product"
+                  :title="item.product_name"
+                  :price="item.price"
                 >
-                  Найти
-                </button>
-              </div>
-              <div class="cart">
-                <button
-                  class="cart-button button button_style_main"
-                  type="button"
-                  @click="setVision"
-                >
-                  Корзина
-                </button>
-                <cart-pup-up-menu v-if="cartPopupVision"></cart-pup-up-menu>
-              </div>
+                </cart-goods-item>
+              </cart>
             </div>
           </div>
         </div>
       </header>
       <main class="wrapper__content">
         <div class="container">
-          <div class="goods-list">
+          <goods-list>
             <goods-item
               v-for="item in filteredGoods"
-              v-bind:item="item"
-            ></goods-item>
-          </div>
+              :key="item.id_product"
+              :title="item.product_name"
+              :price="item.price"
+            >
+              <custom-button>Добавить</custom-button>
+            </goods-item>
+          </goods-list>
         </div>
       </main>
       <footer class="wrapper__footer footer">
