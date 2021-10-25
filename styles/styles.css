@@ -95,6 +95,7 @@
 .pup-up-menu {
   display: flex;
   flex-direction: column;
+  min-width: 520px;
   padding: 13px 20px 40px 20px;
   font: normal 1.1rem/1.2 Roboto, sans-serif;
   color: black;
@@ -134,14 +135,24 @@
   text-align: right;
 }
 
+.cart-goods-item__title {
+  justify-self: left;
+}
+.cart-goods-item__del-button {
+  justify-self: right;
+}
+
 .cart {
   position: relative;
   box-sizing: border-box;
 }
 .cart__goods-item {
   display: grid;
-  grid-template-columns: repeat(3, 100px);
+  grid-template-columns: repeat(4, 130px);
   align-items: center;
+  justify-items: center;
+  font: normal 1.2rem/1.2 Roboto, sans-serif;
+  color: black;
 }
 .cart__goods-item:not(:last-child) {
   margin-bottom: 15px;

@@ -29,9 +29,11 @@
               <cart>
                 <cart-goods-item
                   v-for="item in cart"
-                  :key="item.id_product"
-                  :title="item.product_name"
-                  :price="item.price"
+                  :key="item.product.id_product"
+                  :title="item.product.product_name"
+                  :quantity="item.quantity"
+                  :amount="item.amount"
+                  @remove-item="removeFromCart(item.product.id_product)"
                 ></cart-goods-item>
               </cart>
             </div>
@@ -46,6 +48,7 @@
               :key="item.id_product"
               :title="item.product_name"
               :price="item.price"
+              @add-to-cart="addToCart(item.id_product)"
             ></goods-item>
           </goods-list>
         </div>
