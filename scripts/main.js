@@ -1,7 +1,10 @@
 "use strict";
 
-const API_URL =
-  "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
+const API_URL = "http://localhost:8080";
+const GET_GOODS = `${API_URL}/catalog.json`;
+const GET_CART = `${API_URL}/cart.json`;
+const ADD_TO_CART = `${API_URL}/add`;
+const DELETE_FROM_CART = `${API_URL}/delete`;
 
 // Компонент кнопки.
 const customButton = {
@@ -38,6 +41,7 @@ const popUpMenu = {
   `,
 };
 
+// Компонент корзины
 const cart = {
   data: function () {
     return {
@@ -76,12 +80,14 @@ const cart = {
 const cartGoodsItem = {
   props: {
     title: String,
-    price: Number,
+    quantity: Number,
+    amount: Number,
   },
   data: function () {
     return {
       classList: ["cart__goods-item"],
-      buttonClassList: ["button_style_second"],
+      titleClassList: ["cart-goods-item", "cart-goods-item__title"],
+      buttonClassList: ["button_style_second", "cart-goods-item__del-button"],
     };
   },
   components: {
@@ -89,9 +95,10 @@ const cartGoodsItem = {
   },
   template: `
     <div :class="classList">
-      <div>{{ title }}</div>
-      <div>{{ price }}</div>
-      <custom-button :class="buttonClassList" @click="$emit('delete-item')">
+      <div :class="titleClassList">{{ title }}</div>
+      <div>{{quantity}} шт.</div>
+      <div>{{ amount }}</div>
+      <custom-button :class="buttonClassList" @click="$emit('remove-item')">
         Удалить
       </custom-button>
     </div>
@@ -188,14 +195,34 @@ const app = new Vue({
       });
     },
     getCart: function () {
-      return fetch(`${API_URL}/getBasket.json`).then((response) =>
-        response.json()
-      );
+      return fetch(GET_CART).then((response) => response.json());
     },
     getGoods: function () {
-      return fetch(`${API_URL}/catalogData.json`).then((response) =>
-        response.json()
-      );
+      return fetch(GET_GOODS).then((response) => response.json());
+    },
+    addToCart: function (id) {
+      return fetch(ADD_TO_CART, {
+        method: "PATCH",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      })
+        .then((response) => response.json())
+        .then((cart) => (this.cart = cart));
+    },
+    removeFromCart: function (id) {
+      return fetch(DELETE_FROM_CART, {
+        method: "DELETE",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      })
+        .then((response) => response.json())
+        .then((cart) => (this.cart = cart));
     },
   },
   mounted: function () {
@@ -203,6 +230,6 @@ const app = new Vue({
       this.goods = res;
       this.filteredGoods = res;
     });
-    this.getCart().then((res) => (this.cart = res.contents));
+    this.getCart().then((res) => (this.cart = res));
   },
 });
