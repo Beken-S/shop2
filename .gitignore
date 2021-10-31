@@ -1,3 +1,4 @@
-/styles/sass
+/dist/styles/sass
 /.vscode
 /server/node_modules
+/node_modules
